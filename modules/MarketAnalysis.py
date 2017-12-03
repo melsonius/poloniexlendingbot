@@ -182,6 +182,7 @@ class MarketAnalysis(object):
                     market_data.append("0.1")
             market_data.append('0')  # Percentile field not being filled yet.
             self.insert_into_db(db_con, market_data)
+            time.sleep(self.update_interval)
 
     def insert_into_db(self, db_con, market_data, levels=None):
             if levels is None:
