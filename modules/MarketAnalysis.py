@@ -39,7 +39,7 @@ class MarketDataException(Exception):
 class MarketAnalysis(object):
     def __init__(self, config, api):
         self.currencies_to_analyse = config.get_currencies_list('analyseCurrencies', 'MarketAnalysis')
-        self.update_interval = int(config.get('MarketAnalysis', 'analyseUpdateInterval', 10, 1, 3600))
+        self.update_interval = int(config.get('MarketAnalysis', 'analyseUpdateInterval', 10, 0, 3600))
         self.api = api
         self.lending_style = int(config.get('MarketAnalysis', 'lendingStyle', 75, 1, 99))
         self.recorded_levels = 10
@@ -92,8 +92,13 @@ class MarketAnalysis(object):
             db_con = self.create_connection(cur)
             self.create_rate_table(db_con, self.recorded_levels)
             db_con.close()
-        self.run_threads()
-        self.run_del_threads()
+
+        if self.update_interval > 0:
+            print("DEBUG: Enabling market analysis update threads with interval of {0} seconds".format(self.update_interval))
+            self.run_threads()
+            self.run_del_threads()
+        else:
+            print("DEBUG: Disabling market analysis update threads.")
 
     def run_threads(self):
         """
